@@ -73,6 +73,14 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                     var query = result.OrderBy(res => res.Invoice_Year).Select(res => res.Invoice_Year).Distinct();
                     return Ok(query);
                 }
+                else if (Filter == "Month")
+                {
+                    var query = result.OrderBy(res =>
+                    res.Invoice_Date.Value.Month)
+                        .Select(res => new { Month = res.Invoice_Date.Value.Month, MonthName = _commanRepository.getMonthName((int)res.Invoice_Date.Value.Month) }).Distinct();
+                    return Ok(query);
+                   // _commanRepository.getMonthName(res.Key.Month)
+                }
                 else if (Filter == "Order")
                 {
                     //var query = result.OrderBy(res => res.).Select(res => res.Invoice_Year).Distinct();
@@ -89,8 +97,8 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
         }
         [HttpGet]
-        [Route("CompanySummaryValue/{year}/{company}/{Customer}")]
-        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> getCompanySummaryValue(int year,string company,string Customer) //, string Company_Code, string Product, string Customer_Code, string QtyValue
+        [Route("CompanySummaryValue/{year}/{company}/{Customer}/{Month}")]
+        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> getCompanySummaryValue(int year,string company,string Customer,int Month) //, string Company_Code, string Product, string Customer_Code, string QtyValue
         {
             try
             {
@@ -102,6 +110,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                 DateTime FromDate = Convert.ToDateTime(_fromdate);
                 DateTime ToDate = Convert.ToDateTime(_todate);
                 var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(year,company,Customer); //, Company_Code, Product, Customer_Code
+                var resultMonth = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(year, company, Customer,Month);
 
                 var setYear = year == null || year == 0 ? System.DateTime.Now.Year : year;
                 int Year = Convert.ToInt32(setYear);
@@ -111,11 +120,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                 // var companyUser = await _companyMasterRepository.tblCompanyUsers();
                 double setMonth = _commanRepository.CalculateFinancialMonthDifference(FromDate, ToDate, Year);
 
-                // int month = 0;
-
-
-
-                
+                // int month = 0;                
                     var query1 = result.Where(res => res.Invoice_Year == Year).GroupBy(res => new { res.Company_Code, res.ID }).
 
                                                Select(res => new
@@ -133,10 +138,16 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                                                                 .GroupBy(tar => new { tar.Company_Code, tar.Year })
                                                                 .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
                                                                     // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
-                                                                select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
-                                                                // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
-
-
+                                                                select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0),
+                                                   // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
+                                                   MTD_Inv_Value = from MonthValue in resultMonth
+                                                             .GroupBy(tar => new { tar.Company_Code })
+                                                              .Where(tar => tar.Key.Company_Code == res.Key.Company_Code )
+                                                               select Math.Round(MonthValue.Sum(tar => tar.Item_ValueIn_Lakhs).Value,0),
+                                                   MTD_MC_Value = from MonthValue in resultMonth
+                                                              .GroupBy(tar => new { tar.Company_Code })
+                                                               .Where(tar => tar.Key.Company_Code == res.Key.Company_Code )
+                                                                   select Math.Round(MonthValue.Sum(tar =>  tar.TOTAL_INVMC / 100000).Value,0)
                                                }).OrderBy(res => res.CompanyID);
 
                     var queryTotal = result.Where(res => res.Invoice_Year == Year).GroupBy(res => new { res.Invoice_Year }).
@@ -157,7 +168,13 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                                                                   .GroupBy(tar => new { tar.Year })
                                                                   .Where(tar => tar.Key.Year == Year)
                                                                    // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
-                                                               select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+                                                               select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0),
+                                                  MTD_Inv_Value = from MonthValue in resultMonth
+                                                                .GroupBy(tar => new { tar.Invoice_Year })
+                                                                select Math.Round( MonthValue.Sum(tar => tar.Item_ValueIn_Lakhs).Value,0),
+                                                  MTD_MC_Value = from MonthValue in resultMonth
+                                                  .GroupBy(tar => new { tar.Invoice_Year })
+                                                                  select Math.Round(MonthValue.Sum(tar => tar.TOTAL_INVMC / 100000).Value, 0)
                                               });
 
                     return Ok(query1.Union(queryTotal));
@@ -171,12 +188,12 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
         }
         [HttpGet]
-        [Route("MonthWiseMarginSummary/{Year}/{company}/{Customer}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
-        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> MonthWiseMarginSummary(int Year, string company, string Customer) //, string Company_Code, string Product, string Customer_Code, string QtyValue
+        [Route("MonthWiseMarginSummary/{Year}/{company}/{Customer}/{Month}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
+        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> MonthWiseMarginSummary(int Year, string company, string Customer,int Month) //, string Company_Code, string Product, string Customer_Code, string QtyValue
         {
             try
             {
-                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer); //, Company_Code, Product, Customer_Code
+                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer,Month); //, Company_Code, Product, Customer_Code
 
                 var query = result.Where(res => res.Invoice_Year == Year).GroupBy(res => new { res.Invoice_Date.Value.Year, res.Invoice_Date.Value.Month }).Select(res =>
                                               new
@@ -203,12 +220,12 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         }
 
         [HttpGet]
-        [Route("ProductMarginSummary/{Year}/{company}/{Customer}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
-        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> ProductMarginSummary(int Year, string company, string Customer) //, string Company_Code, string Product, string Customer_Code, string QtyValue
+        [Route("ProductMarginSummary/{Year}/{company}/{Customer}/{Month}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
+        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> ProductMarginSummary(int Year, string company, string Customer,int Month) //, string Company_Code, string Product, string Customer_Code, string QtyValue
         {
             try
             {
-                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer); //, Company_Code, Product, Customer_Code
+                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer, Month); //, Company_Code, Product, Customer_Code
 
                 var query = result.Where(res => res.Invoice_Year == Year).GroupBy(res => new { res.ProdGrp_MIS_Name_L2,res.ProdGrp_MIS_Name_L2_SrNo }).Select(res =>
                                               new
@@ -233,12 +250,12 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         }
 
         [HttpGet]
-        [Route("TechProductMarginSummary/{Year}/{Product}/{company}/{Customer}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
-        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> TechProductMarginSummary(int Year,string Product, string company, string Customer) //, string Company_Code, string Product, string Customer_Code, string QtyValue
+        [Route("TechProductMarginSummary/{Year}/{Product}/{company}/{Customer}/{Month}")] ///{Company_Code}/{Product}/{Customer_Code}/{QtyValue}
+        public async Task<ActionResult<vw_InvoiceMargin_Tech_Details>> TechProductMarginSummary(int Year,string Product, string company, string Customer,int Month) //, string Company_Code, string Product, string Customer_Code, string QtyValue
         {
             try
             {
-                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer); //, Company_Code, Product, Customer_Code
+                var result = await _invoiceMarginRepository.vw_InvoiceMargin_Tech_Details(Year, company, Customer,Month); //, Company_Code, Product, Customer_Code
 
                 var query = result.Where(res => res.Invoice_Year == Year && res.ProdGrp_MIS_Name_L2== Product).GroupBy(res => new { res.ProdGrp_MIS_Name, res.ProdGrp_MIS_Id }).Select(res =>
                                                new

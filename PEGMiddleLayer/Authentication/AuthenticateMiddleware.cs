@@ -36,7 +36,11 @@ namespace PEGMiddleLayer.Authentication
             try
             {
               string authHeader = context.Request.Headers["Authorization"];
-                
+
+                if (authHeader == null)
+                {
+                    string encodedUsernamePassword2 = "";
+                }
                     if (authHeader != null && (authHeader.StartsWith("Basic") || authHeader.StartsWith("Bearer")))
                     {
                         //Extract credentials    
@@ -129,7 +133,9 @@ namespace PEGMiddleLayer.Authentication
             }
             catch (Exception e)
             {
-                // no authorization header    
+                // no authorization header
+                // 
+                _logger.LogInformation("Menu Error:- " + e.Message);
                 context.Response.StatusCode = 400;
                 return;
             }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PEGMiddleLayer.Controllers.Dashboard
 {
-    [Authorize(Roles = "SuperAdmin,BacklogDashboard,BookingDashboard,Admin,BacklogInvoice")]
+    [Authorize(Roles = "SuperAdmin,BacklogDashboard,BookingDashboard,Admin,BacklogInvoice,AccountReceivable")]
     [Route("api/[controller]")]
     [ApiController]
     public class PendingOrderController : ControllerBase

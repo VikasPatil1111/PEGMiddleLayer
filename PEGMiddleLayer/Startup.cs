@@ -32,6 +32,8 @@ using PEGMiddleLayer.Models.Common;
 using PEGMiddleLayer.Models.Dashboard.Invoice;
 using PEGMiddleLayer.DIPattern;
 using PEGMiddleLayer.Models.Dashboard.InvoiceMargin;
+using PEGMiddleLayer.Models.Dashboard.AccountReceivable;
+using PEGMiddleLayer.Models.Dashboard.Inventory;
 
 namespace PEGMiddleLayer
 {
@@ -81,6 +83,8 @@ namespace PEGMiddleLayer
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             services.AddScoped<ICommanRepository, CommanRepository>();
             services.AddScoped<IInvoiceMarginRepository, InvoiceMarginRepository>();
+            services.AddScoped<IAccountReceivableRepository, AccountReceivableRepository>();
+            services.AddScoped<IInventoryRepository, InventoryRepository>();
             //Adding Authenticatio
             services.AddAuthentication(option =>
             {

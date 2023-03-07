@@ -27,6 +27,7 @@ namespace PEGMiddleLayer.Models.Dashboard.Booking
         public double Order_Value { get; set; }
         public int? ProdGrp_MIS_Id { get; set; }
         public string ProdGrp_MIS_Name { get; set; }
+        public string Customer_Code { get; set; }
 
     }
 }

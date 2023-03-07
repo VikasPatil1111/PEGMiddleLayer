@@ -18,8 +18,10 @@ using PEGMiddleLayer.Models.Common;
 
 namespace PEGMiddleLayer.Controllers.Identity
 {
+    [Authorize(Roles = "SuperAdmin,Admin,AccountReceivable")]
     [Route("api/[controller]")]
     [ApiController]
+   
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;

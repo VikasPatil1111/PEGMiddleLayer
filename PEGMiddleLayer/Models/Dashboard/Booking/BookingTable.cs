@@ -34,6 +34,8 @@ namespace PEGMiddleLayer.Models.Dashboard.Booking
         public string Product { get; set; }
         public DateTime? Etl_On { get; set; }
         public int Product_Code { get; set; }
+        public int ID { get; set; }
+        public DateTime? Order_Date { get; set; }
 
     }
 }

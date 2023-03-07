@@ -30,15 +30,28 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         }
 
         [HttpGet]
-        [Route("GetBookingDetails/{Year?}")]
-        public async Task<ActionResult<BookingTable>> GetBookingDetails(int? year)
+        [Route("GetBookingDetails/{Year?}/{MonthName}/{Customer}/{Company}")]
+        public async Task<ActionResult<BookingTable>> GetBookingDetails(int? year,int MonthName,string Customer,string Company)
         {
             try
             {
                 var setYear = year == null ? System.DateTime.Now.Year : year;
+
+               // string Month = MonthName;
                 int Year = Convert.ToInt32(setYear);
-                var result = await _bookingDashboardRepository.bookingTables();
-                var Targetresult = await _bookingDashboardRepository.bookingTargetTables();
+                var result = await _bookingDashboardRepository.bookingTables(Year,MonthName, Customer, Company);
+                var resultYTD = await _bookingDashboardRepository.bookingTablesYTD(Year, MonthName, Customer, Company);
+
+                var Targetresult = await _bookingDashboardRepository.bookingTargetTables(Company);
+                string com;
+                if (Company == null)
+                {
+                    com = "PEG";
+                }
+                else
+                {
+                    com = Company;
+                }
                // var companyUser = await _companyMasterRepository.tblCompanyUsers();
                 double setMonth = 0;
 
@@ -50,43 +63,131 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                 {
                     setMonth = 12;
                 }
-              
-                var query1 = result.Where(res => res.Year == Year).GroupBy(res => new { res.Company_Code }).
+                var query1 = result.GroupBy(res => new { res.Company_Code,res.ID }).
 
-                                           Select(res => new
-                                           {
-                                               Company_Code = res.Key.Company_Code,
-                                               Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
-                                               Target_Value = from target in Targetresult
-                                                              .GroupBy(tar => new { tar.Company_Code, tar.Year })
-                                                              .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
-                                                              select target.Sum(tar => tar.Target).Value,
-                                               Target_YTD = from target in Targetresult
-                                                             .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                                         Select(res => new
+                                         {
+                                             Company_Code = res.Key.Company_Code,
+                                             ID = res.Key.ID,
+                                             Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
+                                             Target_Value = from target in Targetresult
+                                                            .GroupBy(tar => new { tar.Company_Code, tar.Year })
                                                             .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
-                                                                // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
-                                                            select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+                                                            select target.Sum(tar => tar.Target).Value,
+                                             Target_YTD = from target in Targetresult
+                                                           .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                                                          .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
+                                                              // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
+                                                                select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0),
+                                             Order_ValueYTD = from OrderYTD in resultYTD
+                                                              .GroupBy(res1 => new { res1.Company_Code, res1.Year })
+                                                              .Where(res1 => res1.Key.Company_Code == res.Key.Company_Code)
+                                                              select Math.Round((decimal)OrderYTD.Sum(res1 => res1.Order_Value) / 100000, 0)
 
-                                           }).OrderBy(res => res.Company_Code);
 
-                var queryTotal = result.Where(res => res.Year == Year).GroupBy(res => new { res.Year }).
+
+                                         }).OrderBy(res => res.ID);
+
+                var queryTotal = result.GroupBy(res => new { res.Year }).
                                           Select(res => new
-                                          { 
-                                              Company_Code = "PEG",
+                                          {
+                                              Company_Code =  Company == "null" ?  "PEG" : "Total",
+                                              ID = 4,
                                               Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
                                               Target_Value = from target in Targetresult
                                                              .GroupBy(tar => new { tar.Year })
                                                              .Where(tar => tar.Key.Year == Year)
                                                                  // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
-                                                             select target.Sum(tar => tar.Target).Value,
+                                                                 select target.Sum(tar => tar.Target).Value,
                                               Target_YTD = from target in Targetresult
                                                               .GroupBy(tar => new { tar.Year })
                                                               .Where(tar => tar.Key.Year == Year)
                                                                // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
-                                                           select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+                                                               select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0),
+                                              Order_ValueYTD = from OrderYTD in resultYTD
+                                            .GroupBy(res1 => new {  res1.Year })
+                                            //.Where(res1 => res1.Key.Company_Code == res.Key.Company_Code)
+                                                               select Math.Round((decimal)OrderYTD.Sum(res1 => res1.Order_Value) /100000,0)
                                           });
-             
+
                 return Ok(query1.Union(queryTotal));
+                //if (MonthName == 0)
+                //{
+                //    var query1 = result.Where(res => res.Year == Year).GroupBy(res => new { res.Company_Code }).
+
+                //                               Select(res => new
+                //                               {
+                //                                   Company_Code = res.Key.Company_Code,
+                //                                   Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
+                //                                   Target_Value = from target in Targetresult
+                //                                                  .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                //                                                  .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
+                //                                                  select target.Sum(tar => tar.Target).Value,
+                //                                   Target_YTD = from target in Targetresult
+                //                                                 .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                //                                                .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
+                //                                                    // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
+                //                                                select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+
+                //                               }).OrderBy(res => res.Company_Code);
+
+                //    var queryTotal = result.Where(res => res.Year == Year).GroupBy(res => new { res.Year }).
+                //                              Select(res => new
+                //                              {
+                //                                  Company_Code = "PEG",
+                //                                  Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
+                //                                  Target_Value = from target in Targetresult
+                //                                                 .GroupBy(tar => new { tar.Year })
+                //                                                 .Where(tar => tar.Key.Year == Year)
+                //                                                     // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
+                //                                                 select target.Sum(tar => tar.Target).Value,
+                //                                  Target_YTD = from target in Targetresult
+                //                                                  .GroupBy(tar => new { tar.Year })
+                //                                                  .Where(tar => tar.Key.Year == Year)
+                //                                                   // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
+                //                                               select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+                //                              });
+
+                //    return Ok(query1.Union(queryTotal));
+                //}
+                //else {
+                //    var query1 = result.Where(res => res.Year == Year && res.Month==MonthName).GroupBy(res => new { res.Company_Code }).
+
+                //                                   Select(res => new
+                //                                   {
+                //                                       Company_Code = res.Key.Company_Code,
+                //                                       Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
+                //                                       Target_Value = from target in Targetresult
+                //                                                      .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                //                                                      .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year )
+                //                                                      select target.Sum(tar => tar.Target).Value,
+                //                                       Target_YTD = from target in Targetresult
+                //                                                     .GroupBy(tar => new { tar.Company_Code, tar.Year })
+                //                                                    .Where(tar => tar.Key.Company_Code == res.Key.Company_Code && tar.Key.Year == Year)
+                //                                                        // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code).                                                               
+                //                                                select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+
+                //                                   }).OrderBy(res => res.Company_Code);
+
+                //    var queryTotal = result.Where(res => res.Year == Year && res.Month == MonthName).GroupBy(res => new { res.Year }).
+                //                              Select(res => new
+                //                              {
+                //                                  Company_Code = "PEG",
+                //                                  Order_Value = Math.Round((decimal)res.Sum(res => res.Order_Value) / 100000, 0),
+                //                                  Target_Value = from target in Targetresult
+                //                                                 .GroupBy(tar => new { tar.Year })
+                //                                                 .Where(tar => tar.Key.Year == Year)
+                //                                                     // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
+                //                                                 select target.Sum(tar => tar.Target).Value,
+                //                                  Target_YTD = from target in Targetresult
+                //                                                  .GroupBy(tar => new { tar.Year })
+                //                                                  .Where(tar => tar.Key.Year == Year)
+                //                                                   // .Where(tar => tar.Key.Company_Code == res.Key.Company_Code)
+                //                                               select Math.Round((target.Sum(tar => tar.Target).Value / 12) * setMonth, 0)
+                //                              });
+
+                //    return Ok(query1.Union(queryTotal));
+                //}
             }
             catch (Exception ex)
             {
@@ -101,7 +202,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         {
             try
             {
-                var Result = await _bookingDashboardRepository.bookingTargetTables();
+                var Result = await _bookingDashboardRepository.bookingTargetTables("");
 
                 return Ok(Result);
             }
@@ -113,36 +214,28 @@ namespace PEGMiddleLayer.Controllers.Dashboard
 
         }
         [HttpGet]
-        [Route("GetDealerNonDealer/{Year?}")]
-        public async Task<ActionResult<BookingTable>> GetDealerNonDealer(int? year)
+        [Route("GetDealerNonDealer/{Year?}/{Month}/{Customer}/{Company}")]
+        public async Task<ActionResult<BookingTable>> GetDealerNonDealer(int? year,int Month,string Customer,string Company)
         {
             try
             {
                 var setYear = year == null ? System.DateTime.Now.Year : year;
                 int Year = Convert.ToInt32(setYear);
-                //var result = await _bookingDashboardRepository.bookingTables();
-
-                //var query = result.Where(res => res.Year == Year) .GroupBy(res => new { res.Company_Code, res.Dealer_NonDealer }).Select(
-                //                res => new
-                //                {
-                //                    Company_Code = res.Key.Company_Code,
-                //                    Dealer_NonDealer = res.Key.Dealer_NonDealer,
-                //                    Booking_Value = Math.Round(res.Sum(res => (double)res.Order_Value), 0)
-
-                //                }
-                //            ).OrderBy(res =>  res.Company_Code );
-                var result = await _bookingDashboardRepository.GetBookingDealerNonDealers();
-                var query = result.Where(res => res.Year == Year).
+               
+                var result = await _bookingDashboardRepository.GetBookingDealerNonDealers( Year, Month, Customer, Company);
+                var query = result.Where(res => res.Year == Year).GroupBy(res => new { res.Company_Code,res.ID }).
                                 Select(res => new {
-                                    Company_Code = res.Company_Code,
-                                    Dealer = Math.Round(res.Dealer / 100000, 0),
-                                    Direct = Math.Round(res.Direct / 100000, 0),
-                                    Inter_Company = Math.Round(res.Inter_Company / 100000, 0)
-                                });
+                                    Company_Code = res.Key.Company_Code,
+                                    IDs = res.Key.ID,
+                                    Dealer = res.Sum(res=> Math.Round(res.Dealer / 100000, 0)),
+                                    Direct = res.Sum(res => Math.Round(res.Direct / 100000, 0)),
+                                    Inter_Company = res.Sum(res => Math.Round(res.Inter_Company / 100000, 0))
+                                }).OrderBy(res => res.IDs);
                 var query_PEG = result.Where(res => res.Year == Year).
                                 GroupBy(res => true).
                                 Select(res => new {
-                                    Company_Code = "PEG",
+                                    Company_Code = Company == "null" ? "PEG" : "Total",
+                                    IDs =4,
                                     Dealer = Math.Round(res.Sum(res => res.Dealer) / 100000, 0),
                                     Direct = Math.Round(res.Sum(res => res.Direct) / 100000, 0),
                                     Inter_Company = Math.Round(res.Sum(res => res.Inter_Company) / 100000, 0)
@@ -156,27 +249,83 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
 
         }
+
         [HttpGet]
-        [Route("GetBookingBranchWise/{Year?}")]
-        public async Task<ActionResult<BookingTable>> GetBookingBranchWise(int? year)
+        [Route("GetDataInGrid/{Year?}/{Month}/{Customer}/{Company}")]
+        public async Task<ActionResult<BookingTable>> GetDataInGrid(int? year, int Month, string Customer, string Company)
+        {
+            try
+            {
+                var setYear = year == null ? System.DateTime.Now.Year : year;
+                int Year = Convert.ToInt32(setYear);
+                int id = 1;
+                var result = await _bookingDashboardRepository.bookingTables(Year, Month, Customer, Company);
+                var query = result.Where(res => res.Year == Year)
+                                .GroupBy(res =>
+                                            new { 
+                                                res.Year,
+                                                res.Month_Name,
+                                                res.Company_Code,
+                                                res.ID,
+                                                res.Dealer_NonDealer,
+                                                res.Order_Year,
+                                                res.Order_Type,
+                                                res.Order_Serial_No,
+                                                res.Create_Date,
+                                                res.Branch_Name,
+                                                res.Customer_Code,
+                                                res.Customer_Name,
+                                                res.Order_Date
+                                            }).
+                                Select(res => new {
+                                    Id = id++,
+                                    Year= res.Key.Year,
+                                    Month_Name=  res.Key.Month_Name,
+                                    Company_Code = res.Key.Company_Code,
+                                    IDs = res.Key.ID,
+                                    Dealer_NonDealer = res.Key.Dealer_NonDealer,
+                                    Order_Year = res.Key.Order_Year,
+                                    Order_Type = res.Key.Order_Type,
+                                    Order_Serial_No = res.Key.Order_Serial_No,
+                                    Order_Date = res.Key.Order_Date.Value.ToString("dd/MM/yyyy"),
+                                    Branch_Name = res.Key.Branch_Name,
+                                    Customer_Code = res.Key.Customer_Code,
+                                    Customer_Name = res.Key.Customer_Name,
+                                    Order_Value = res.Sum(res => res.Order_Value)
+                                }).OrderBy(res => res.IDs);
+               
+                return Ok(query);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error While Retriving Data From Database");
+            }
+
+        }
+
+        [HttpGet]
+        [Route("GetBookingBranchWise/{Year?}/{Month}/{Customer}/{Comapny}")]
+        public async Task<ActionResult<BookingTable>> GetBookingBranchWise(int? year,int Month,string Customer,string Comapny)
         {
             var setYear = year == null ? System.DateTime.Now.Year : year;
             int Year = Convert.ToInt32(setYear);
             //var result = await _bookingDashboardRepository.bookingTables();
-            var result1 = await _bookingDashboardRepository.GetBookingCompanyBranches();
+            var result1 = await _bookingDashboardRepository.GetBookingCompanyBranches(Year,Month,Customer, Comapny);
             //var query = result.Where(res => res.Domestic_Export == "Domestic" && res.Year == Year)
             //                  .GroupBy(res => new { res.Branch_Name })
             //                  .Select(res => new {
             //                      Branch_Name = res.Key.Branch_Name,
             //                      Order_Value = Math.Round( res.Sum( res=> (double)res.Order_Value)/100000,0)
             //                  });
-            var query2 = result1.Where(res => res.Year == Year).GroupBy(res => new { res.Branch_Name })
+            var query2 = result1.Where(res => res.Year == Year).GroupBy(res => new { res.Branch_Name,res.Serial_No })
                                 .Select(res => new { res.Key.Branch_Name, 
+                                Serial_No = res.Key.Serial_No,
                                     IV1 = res.Sum(r=> Math.Round(r.IV1,0)) , 
                                     IV2 = res.Sum(r => Math.Round(r.IV2, 0)) ,// Math.Round(res.IVU2, 0), 
                                     EIPL = res.Sum(r => Math.Round(r.EIPL, 0)), //Math.Round(res.EIPL, 0) ,
                                     PEG = res.Sum(r => Math.Round(r.IV1, 0)) + res.Sum(r => Math.Round(r.IV2, 0)) + res.Sum(r => Math.Round(r.EIPL, 0))})
-                                .OrderBy(res => res.Branch_Name);
+                                .OrderBy(res => res.Serial_No);
 
             return Ok(query2);
         }
@@ -187,7 +336,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         {
             try
             {
-                var result = await _bookingDashboardRepository.bookingTables();
+                var result = await _bookingDashboardRepository.bookingTables(0,0,"","");
                 return Ok(result.Select(res => res.Year).OrderBy(res => res.Value).Distinct());
             }
             catch (Exception ex)
@@ -197,7 +346,22 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
 
         }
+        [HttpGet]
+        [Route("getBookingCompany")]
+        public async Task<ActionResult<BookingTable>> getBookingCompany()
+        {
+            try
+            {
+                var result = await _bookingDashboardRepository.bookingTables(0, 0, "","");
+                return Ok(result.OrderBy(res => res.ID).Select(res => res.Company_Code).Distinct());
+            }
+            catch (Exception ex)
+            {
 
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error When Retriving Data From Server");
+            }
+
+        }
         [HttpGet]
         [Route("GetBookingChartDelayAnalyses")]
         public async Task<ActionResult<BookingChartDelayAnalysis>> GetBookingChartDelayAnalyses()
@@ -233,13 +397,18 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
         }
         [HttpGet]
-        [Route("GetBookingYearDelayAnalyses/{Year}")]
-        public async Task<ActionResult<BookingTable>> GetBookingYearDelayAnalyses(int Year)
+        [Route("GetBookingYearDelayAnalyses/{Company}")]
+        public async Task<ActionResult<BookingTable>> GetBookingYearDelayAnalyses(string Company)
         {
             try
             {
-                var result = await _bookingDashboardRepository.bookingTables();
-                var query = result.Where(res => res.Year == Year);
+                var result = await _bookingDashboardRepository.bookingTables(0,0,"", Company);
+                var query = result.GroupBy(res => new { res.Year }).Select(
+                    res => new {
+                        res.Key.Year,
+                        Order_Value = Math.Round((double)res.Sum( res=>res.Order_Value/100000),0)
+                    }
+                    );
                 return Ok(query);
             }
             catch (Exception ex)
@@ -254,7 +423,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         {
             try
             {
-                var result = await _bookingDashboardRepository.bookingTables();
+                var result = await _bookingDashboardRepository.bookingTables(Year,0,"","");
                 var Query = result.Where(res => res.Year == Year)
                                   .GroupBy(res => new { res.Month_Name })
                                   .Select(res => new { Month_Name = res.Key.Month_Name });
@@ -276,7 +445,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             try
             {
 
-                var result = await _bookingDashboardRepository.bookingTables();
+                var result = await _bookingDashboardRepository.bookingTables(2023,0,"","");
                 var Query = result.Where(res => res.Year >2021)
                                    //  .GroupBy(res => new { res.Product_Code, res.Product })
                                     
@@ -298,13 +467,13 @@ namespace PEGMiddleLayer.Controllers.Dashboard
 
         }
         [HttpGet]
-        [Route("GetBFVProductSpecGrid/{Product_Code}/{Year}")]
-        public async Task<ActionResult<tblBI_BFV_Order_TechDtl>> GetBFVProductSpec(int Product_Code, int Year)
+        [Route("GetBFVProductSpecGrid/{Product_Code}/{Year}/{Company}")]
+        public async Task<ActionResult<tblBI_BFV_Order_TechDtl>> GetBFVProductSpec(int Product_Code, int Year,string Company)
         {
 
             try
             {
-                var Book_result = await _bookingDashboardRepository.GetTblBooking_Tech_Dtls();
+                var Book_result = await _bookingDashboardRepository.GetTblBooking_Tech_Dtls(Year,Product_Code,"", Company,0);
                 int Id = 1;
                 var query = Book_result.Where(res => res.Product_Code == Product_Code
                                        && res.Year == Year)
@@ -349,17 +518,16 @@ namespace PEGMiddleLayer.Controllers.Dashboard
         }
 
         [HttpGet]
-        [Route("GetBFVProductSpecChart/{Year}/{Product_Code}/{Month?}")]
-        public async Task<ActionResult<tblBI_BFV_Order_TechDtl>> GetBFVProductSpecChart(int Year, int Product_Code, int? Month)
+        [Route("GetBFVProductSpecChart/{Year}/{Product_Code}/{Customer}/{Company}/{Month?}")]
+        public async Task<ActionResult<tblBI_BFV_Order_TechDtl>> GetBFVProductSpecChart(int Year, int Product_Code,string Customer,string Company, int? Month)
         {
             try
             {
-                var result = await _bookingDashboardRepository.GetTblBooking_Tech_Dtls();
+                var result = await _bookingDashboardRepository.GetTblBooking_Tech_Dtls(Year,Product_Code,Customer, Company, Month);
 
-                if (Month == null || Month==0)
-                {
-                    var query =
-                     result.Where(res => res.Product_Code == Product_Code && res.Year == Year)
+                var query =
+                     result
+                     //.Where(res => res.Product_Code == Product_Code && res.Year == Year)
                                   .GroupBy(res => new { res.Company_Code, res.Year, res.ProdGrp_MIS_Id, res.ProdGrp_MIS_Name })
                                   .Select(res => new
                                   {
@@ -370,24 +538,40 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                                       Order_Value = Math.Round(res.Sum(res => res.Order_Value) / 100000, 0)
 
                                   }).OrderBy(res => res.ProdGrp_MIS_Id);
-                    return Ok(query);
-                }
-                else
-                {
-                    var query =
-                         result.Where(res => res.Product_Code == Product_Code && res.Year == Year && res.Month == Month)
-                                      .GroupBy(res => new { res.Company_Code, res.Year, res.ProdGrp_MIS_Id, res.ProdGrp_MIS_Name })
-                                      .Select(res => new
-                                      {
-                                          Company_Code = res.Key.Company_Code,
-                                          Year = res.Key.Year,
-                                          ProdGrp_MIS_Id = res.Key.ProdGrp_MIS_Id,
-                                          ProdGrp_MIS_Name = res.Key.ProdGrp_MIS_Name,
-                                          Order_Value = Math.Round(res.Sum(res => res.Order_Value) / 100000, 0)
+                return Ok(query);
 
-                                      }).OrderBy(res => res.ProdGrp_MIS_Id);
-                    return Ok(query);
-                }
+                //if (Month == null || Month==0)
+                //{
+                //    var query =
+                //     result.Where(res => res.Product_Code == Product_Code && res.Year == Year)
+                //                  .GroupBy(res => new { res.Company_Code, res.Year, res.ProdGrp_MIS_Id, res.ProdGrp_MIS_Name })
+                //                  .Select(res => new
+                //                  {
+                //                      Company_Code = res.Key.Company_Code,
+                //                      Year = res.Key.Year,
+                //                      ProdGrp_MIS_Id = res.Key.ProdGrp_MIS_Id,
+                //                      ProdGrp_MIS_Name = res.Key.ProdGrp_MIS_Name,
+                //                      Order_Value = Math.Round(res.Sum(res => res.Order_Value) / 100000, 0)
+
+                //                  }).OrderBy(res => res.ProdGrp_MIS_Id);
+                //    return Ok(query);
+                //}
+                //else
+                //{
+                //    var query =
+                //         result.Where(res => res.Product_Code == Product_Code && res.Year == Year && res.Month == Month)
+                //                      .GroupBy(res => new { res.Company_Code, res.Year, res.ProdGrp_MIS_Id, res.ProdGrp_MIS_Name })
+                //                      .Select(res => new
+                //                      {
+                //                          Company_Code = res.Key.Company_Code,
+                //                          Year = res.Key.Year,
+                //                          ProdGrp_MIS_Id = res.Key.ProdGrp_MIS_Id,
+                //                          ProdGrp_MIS_Name = res.Key.ProdGrp_MIS_Name,
+                //                          Order_Value = Math.Round(res.Sum(res => res.Order_Value) / 100000, 0)
+
+                //                      }).OrderBy(res => res.ProdGrp_MIS_Id);
+                //    return Ok(query);
+                //}
 
                 // return NotFound();
 
@@ -438,6 +622,23 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                 return Ok(query);
             }
             
+        }
+
+        [HttpGet]
+        [Route("BookingCustomerList/{Year}/{Company}/{Month}")]
+        public async Task<ActionResult<vw_BookingCustomerList>> BookingCustomerList(int Year,string Company,int Month)
+        {
+            try
+            {
+                var result = await _bookingDashboardRepository.GetBookingCustomerList(Year, Company, Month);
+                return Ok(result.OrderBy(res=>  res.PAN_No).ThenBy(res =>res.GSTIN));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Server Error Please try again later..");
+                
+            }
+          
         }
 
     }

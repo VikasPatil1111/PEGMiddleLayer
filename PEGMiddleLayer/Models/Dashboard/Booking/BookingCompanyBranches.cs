@@ -13,5 +13,8 @@ namespace PEGMiddleLayer.Models.Dashboard.Booking
         public double IV2 { get; set; }
         public double EIPL { get; set; }
         public string Company_Code { get; set; }
+        public int Month { get; set; }
+        public string Customer_Code { get; set; }
+        public int Serial_No { get; set; }
     }
 }

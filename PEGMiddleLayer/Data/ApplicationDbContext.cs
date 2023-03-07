@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using PEGMiddleLayer.Models.Common;
 using PEGMiddleLayer.Models.CompanySelection;
 using PEGMiddleLayer.Models.Dashboard;
+using PEGMiddleLayer.Models.Dashboard.AccountReceivable;
 using PEGMiddleLayer.Models.Dashboard.Backlog;
 using PEGMiddleLayer.Models.Dashboard.Booking;
 using PEGMiddleLayer.Models.Dashboard.Common;
+using PEGMiddleLayer.Models.Dashboard.Inventory;
 using PEGMiddleLayer.Models.Dashboard.Invoice;
 using PEGMiddleLayer.Models.Dashboard.InvoiceMargin;
 using PEGMiddleLayer.Models.Dashboard.MISReport;
@@ -39,8 +41,8 @@ namespace PEGMiddleLayer.Authentication
         public DbSet<ProductWisePendingOrder> vw_ProductWisePendingOrderSummary { get; set; }
         public DbSet<PendingOrderDetailsBarChart> vw_PendingOrderBarSummary { get; set; }
         public DbSet<PendingOrderQtyDetailsBarChart> vw_PendingOrderBarQtySummary { get; set; }
-        public DbSet<BookingTable> tblBI_MISOrderBooking_Dtl { get; set; }
-
+       // public DbSet<BookingTable> tblBI_MISOrderBooking_Dtl { get; set; }
+       public DbSet<BookingTable> vwtblBI_MISOrderBooking_Dtl { get; set; }
         public DbSet<BookingTargetTable> tblBI_OrderBooking_Target { get; set; }
 
         public DbSet<BookingDealerNonDealer> vw_BookingDealerNonDealer { get; set; }
@@ -67,6 +69,18 @@ namespace PEGMiddleLayer.Authentication
         public DbSet<vw_InvoiceMargin_Tech_Details> vw_InvoiceMargin_Tech_Details { get; set; }
         public DbSet<vw_InvoiceMarginCustomerList> vw_InvoiceMarginCustomerList { get; set; }
         public DbSet<tblMainMenu_Access> tblMainMenu_Access { get; set; }
+
+        public DbSet<vw_BookingCustomerList> vw_BookingCustomerList { get; set; }
+        public DbSet<tblMIS_AccRec_Details> vw_AccountReceivableCustomerList { get; set; }
+        public DbSet<tblBranch_User> tblBranch_User { get; set; }
+
+        public DbSet<tblTotal_Inventory_Details> vwtblTotal_Inventory_Details { get; set; }
+        public DbSet<vwInventoryAgingSummary> vwInventoryAgingSummary { get; set; }
+
+        public DbSet<vwInventotyTypeDetails> vwInventotyTypeDetails { get; set; }
+        public DbSet<vwInventoryAgingSummaryAllocated> vwInventoryAgingSummaryAllocated { get; set; }
+        public DbSet<vwInventoryAgingSummaryUnAllocated> vwInventoryAgingSummaryUnAllocated { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -92,6 +106,13 @@ namespace PEGMiddleLayer.Authentication
             builder.Entity<vw_Invoice_Yearly_Company_Summary>().HasNoKey();
             builder.Entity<vw_InvoiceMargin_Tech_Details>().HasNoKey();
             builder.Entity<vw_InvoiceMarginCustomerList>().HasNoKey();
+            builder.Entity<vw_BookingCustomerList>().HasNoKey();
+            builder.Entity<tblMIS_AccRec_Details>().HasNoKey();
+            builder.Entity<tblTotal_Inventory_Details>().HasNoKey();
+            builder.Entity<vwInventoryAgingSummary>().HasNoKey();
+            builder.Entity<vwInventotyTypeDetails>().HasNoKey();
+            builder.Entity<vwInventoryAgingSummaryAllocated>().HasNoKey();
+            builder.Entity<vwInventoryAgingSummaryUnAllocated>().HasNoKey();
             //builder.Entity<tblCompanyUsers>()
             //     .HasOne(e => e.tblCompanyMasters)
             //     .WithMany(c => c.tbl);
