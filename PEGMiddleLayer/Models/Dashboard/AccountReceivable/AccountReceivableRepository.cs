@@ -74,7 +74,7 @@ namespace PEGMiddleLayer.Models.Dashboard.AccountReceivable
 
             var getBrach = await tblBranch_Users(setDatabase.UserId);
 
-            string[] branches = new string[3];
+            string[] branches = new string[10];
             int index = 0;
             if (getBrach.Any() )
             {
@@ -169,7 +169,7 @@ namespace PEGMiddleLayer.Models.Dashboard.AccountReceivable
 
             var getBrach = await tblBranch_Users(setDatabase.UserId);
 
-            string[] branches = new string[3];
+            string[] branches = new string[10];
             int index = 0;
             if (getBrach.Any())
             {

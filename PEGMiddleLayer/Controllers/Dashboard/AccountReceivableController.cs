@@ -53,6 +53,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
             }
            
         }
+
         [HttpGet]
         [Route("BranchWiseDetails/{Company}/{CustomerCode}/{DueFilter}/{OverDueFilter}")]
         public async Task<ActionResult<tblMIS_AccRec_Details>> BranchWiseDetails(string Company, string CustomerCode, int DueFilter, int OverDueFilter)

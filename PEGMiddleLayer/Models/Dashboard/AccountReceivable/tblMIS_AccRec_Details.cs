@@ -40,5 +40,21 @@ namespace PEGMiddleLayer.Models.Dashboard.AccountReceivable
         public int ID { get; set; }
         public string GSTIN { get; set; }
         public string PAN_No { get; set; }
+        public double? Non_Collectable_Amt { get; set; }
+        public double? Collectable_Amt { get; set; }
+        public double? PDC_Collected_Amt { get; set; }
+        public double? LC_Collected_Amt { get; set; }
+        public double? PBG_Amt { get; set; }
+        public double? Retention_Amt { get; set; }
+        public double? due_OS0_15 { get; set; }
+        public double? due_OS16_30 { get; set; }
+        public double? due_OS31_60 { get; set; }
+        public double? due_OSAbove_60 { get; set; }
+        public double? Od_OS0_15 { get; set; }
+        public double? Od_OS16_30 { get; set; }
+        public double? Od_OS31_60 { get; set; }
+        public double? Od_OSAbove_60 { get; set; }
+        public double? Total_Due { get; set; }
+        public double? Over_Due { get; set; }        
     }
 }
