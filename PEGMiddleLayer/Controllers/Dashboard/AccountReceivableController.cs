@@ -71,16 +71,37 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         Branch_Name = res.Key.Branch_Name,
                         SrNo = (int) res.Key.SrNo,
                         Total_Receivable = Math.Round((double)res.Sum(res => res.Receivable), 0),
-                        Not_Due_Amount = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0) + Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
-                        Cdue_OS0_30 = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0),
-                        Cdue_OS31_60 = Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0),
-                        Cdue_OS61_90 = Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0),
-                        Cdue_OSAbv90 = Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
-                        Over_Due_Amount = Math.Round((double)res.Sum(res => res.COver_Due), 0),
-                        COd_OS0_30 = Math.Round((double)res.Sum(res => res.COd_OS0_30), 0),
-                        COd_OS31_60 = Math.Round((double)res.Sum(res => res.COd_OS31_60), 0),
-                        COd_OS61_90 = Math.Round((double)res.Sum(res => res.COd_OS61_90), 0),
-                        COd_OSAbv90 = Math.Round((double)res.Sum(res => res.COd_OSAbv90), 0),
+                        Non_Collectable_Amt = Math.Round((double)res.Sum(res => res.Non_Collectable_Amt), 0),
+                        Collectable_Amt = Math.Round((double)res.Sum(res => res.Collectable_Amt), 0),
+                        PDC_Collected_Amt = Math.Round((double)res.Sum(res => res.PDC_Collected_Amt), 0),
+                        LC_Collected_Amt = Math.Round((double)res.Sum(res => res.LC_Collected_Amt), 0),
+                        PBG_Amt = Math.Round((double)res.Sum(res => res.PBG_Amt), 0),
+                        Retention_Amt = Math.Round((double)res.Sum(res => res.Retention_Amt), 0),
+                        Total_Due = Math.Round((double)res.Sum(res => res.Total_Due), 0),
+                        due_OS0_15 = Math.Round((double)res.Sum(res => res.due_OS0_15), 0),
+                        due_OS16_30 = Math.Round((double)res.Sum(res => res.due_OS16_30), 0),
+                        due_OS31_60 = Math.Round((double)res.Sum(res => res.due_OS31_60), 0),
+                        due_OSAbove_60 = Math.Round((double)res.Sum(res => res.due_OSAbove_60), 0),
+                        Over_Due = Math.Round((double)res.Sum(res => res.Over_Due), 0),
+                        Od_OS0_15 = Math.Round((double)res.Sum(res => res.Od_OS0_15), 0),
+                        Od_OS16_30 = Math.Round((double)res.Sum(res => res.Od_OS16_30), 0),
+                        Od_OS31_60 = Math.Round((double)res.Sum(res => res.Od_OS31_60), 0),
+                        Od_OSAbove_60 = Math.Round((double)res.Sum(res => res.Od_OSAbove_60), 0)
+
+
+
+                        /*
+                          Not_Due_Amount = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0) + Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
+                          Cdue_OS0_30 = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0),
+                          Cdue_OS31_60 = Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0),
+                          Cdue_OS61_90 = Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0),
+                          Cdue_OSAbv90 = Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
+                          Over_Due_Amount = Math.Round((double)res.Sum(res => res.COver_Due), 0),
+                          COd_OS0_30 = Math.Round((double)res.Sum(res => res.COd_OS0_30), 0),
+                          COd_OS31_60 = Math.Round((double)res.Sum(res => res.COd_OS31_60), 0),
+                          COd_OS61_90 = Math.Round((double)res.Sum(res => res.COd_OS61_90), 0),
+                          COd_OSAbv90 = Math.Round((double)res.Sum(res => res.COd_OSAbv90), 0),
+                        */
                     }).OrderBy(res=> res.SrNo);
                 var queryTotal = result.GroupBy(res => true)
                    .Select(res => new
@@ -91,16 +112,34 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         Branch_Name = "Total:-" ,
                        SrNo = 0,
                        Total_Receivable = Math.Round((double)res.Sum(res => res.Receivable), 0),
-                       Not_Due_Amount = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0) + Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
-                       Cdue_OS0_30 = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0),
-                       Cdue_OS31_60 = Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0),
-                       Cdue_OS61_90 = Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0),
-                       Cdue_OSAbv90 = Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
-                       Over_Due_Amount = Math.Round((double)res.Sum(res => res.COver_Due), 0),
-                       COd_OS0_30 = Math.Round((double)res.Sum(res => res.COd_OS0_30), 0),
-                       COd_OS31_60 = Math.Round((double)res.Sum(res => res.COd_OS31_60), 0),
-                       COd_OS61_90 = Math.Round((double)res.Sum(res => res.COd_OS61_90), 0),
-                       COd_OSAbv90 = Math.Round((double)res.Sum(res => res.COd_OSAbv90), 0),
+                       Non_Collectable_Amt = Math.Round((double)res.Sum(res => res.Non_Collectable_Amt), 0),
+                       Collectable_Amt = Math.Round((double)res.Sum(res => res.Collectable_Amt), 0),
+                       PDC_Collected_Amt = Math.Round((double)res.Sum(res => res.PDC_Collected_Amt), 0),
+                       LC_Collected_Amt = Math.Round((double)res.Sum(res => res.LC_Collected_Amt), 0),
+                       PBG_Amt = Math.Round((double)res.Sum(res => res.PBG_Amt), 0),
+                       Retention_Amt = Math.Round((double)res.Sum(res => res.Retention_Amt), 0),
+                       Total_Due = Math.Round((double)res.Sum(res => res.Total_Due), 0),
+                       due_OS0_15 = Math.Round((double)res.Sum(res => res.due_OS0_15), 0),
+                       due_OS16_30 = Math.Round((double)res.Sum(res => res.due_OS16_30), 0),
+                       due_OS31_60 = Math.Round((double)res.Sum(res => res.due_OS31_60), 0),
+                       due_OSAbove_60 = Math.Round((double)res.Sum(res => res.due_OSAbove_60), 0),
+                       Over_Due = Math.Round((double)res.Sum(res => res.Over_Due), 0),
+                       Od_OS0_15 = Math.Round((double)res.Sum(res => res.Od_OS0_15), 0),
+                       Od_OS16_30 = Math.Round((double)res.Sum(res => res.Od_OS16_30), 0),
+                       Od_OS31_60 = Math.Round((double)res.Sum(res => res.Od_OS31_60), 0),
+                       Od_OSAbove_60 = Math.Round((double)res.Sum(res => res.Od_OSAbove_60), 0)
+                       /*
+                        Not_Due_Amount = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0) + Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
+                        Cdue_OS0_30 = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0),
+                        Cdue_OS31_60 = Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0),
+                        Cdue_OS61_90 = Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0),
+                        Cdue_OSAbv90 = Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
+                        Over_Due_Amount = Math.Round((double)res.Sum(res => res.COver_Due), 0),
+                        COd_OS0_30 = Math.Round((double)res.Sum(res => res.COd_OS0_30), 0),
+                        COd_OS31_60 = Math.Round((double)res.Sum(res => res.COd_OS31_60), 0),
+                        COd_OS61_90 = Math.Round((double)res.Sum(res => res.COd_OS61_90), 0),
+                        COd_OSAbv90 = Math.Round((double)res.Sum(res => res.COd_OSAbv90), 0),
+                       */
                    });
 
                 return Ok(query.Union(queryTotal));
@@ -177,6 +216,7 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         res.Document_Amount      ,
                         res.Adjusted_Amount      ,
                         res.Receivable      ,
+
                         res.Cdue_OS0_30      ,
                         res.Cdue_OS31_60      ,
                         res.Cdue_OS61_90      ,
@@ -185,7 +225,24 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         res.COd_OS0_30      ,
                         res.COd_OS31_60      ,
                         res.COd_OS61_90      ,
-                        res.COd_OSAbv90
+                        res.COd_OSAbv90,
+
+                        res.Non_Collectable_Amt,
+                        res.Collectable_Amt ,
+                        res.PDC_Collected_Amt ,
+                        res.LC_Collected_Amt ,
+                        res.PBG_Amt ,
+                        res.Retention_Amt ,
+                        res.Total_Due ,
+                        res.due_OS0_15 ,
+                        res.due_OS16_30 ,
+                        res.due_OS31_60 ,
+                        res.due_OSAbove_60 ,
+                        res.Over_Due ,
+                        res.Od_OS0_15 ,
+                        res.Od_OS16_30 ,
+                        res.Od_OS31_60 ,
+                        res.Od_OSAbove_60 ,
                     }
                     );
                 return Ok(query);
@@ -222,6 +279,24 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         Customer_Name=  res.Key.Customer_Name,
                         GSTIN=  res.Key.GSTIN,
                         PAN_No=  res.Key.PAN_No,
+                        Total_Receivable = Math.Round((double)res.Sum(res => res.Receivable), 0),
+                        Non_Collectable_Amt = Math.Round((double)res.Sum(res => res.Non_Collectable_Amt), 0),
+                        Collectable_Amt = Math.Round((double)res.Sum(res => res.Collectable_Amt), 0),
+                        PDC_Collected_Amt = Math.Round((double)res.Sum(res => res.PDC_Collected_Amt), 0),
+                        LC_Collected_Amt = Math.Round((double)res.Sum(res => res.LC_Collected_Amt), 0),
+                        PBG_Amt = Math.Round((double)res.Sum(res => res.PBG_Amt), 0),
+                        Retention_Amt = Math.Round((double)res.Sum(res => res.Retention_Amt), 0),
+                        Total_Due = Math.Round((double)res.Sum(res => res.Total_Due), 0),
+                        due_OS0_15 = Math.Round((double)res.Sum(res => res.due_OS0_15), 0),
+                        due_OS16_30 = Math.Round((double)res.Sum(res => res.due_OS16_30), 0),
+                        due_OS31_60 = Math.Round((double)res.Sum(res => res.due_OS31_60), 0),
+                        due_OSAbove_60 = Math.Round((double)res.Sum(res => res.due_OSAbove_60), 0),
+                        Over_Due = Math.Round((double)res.Sum(res => res.Over_Due), 0),
+                        Od_OS0_15 = Math.Round((double)res.Sum(res => res.Od_OS0_15), 0),
+                        Od_OS16_30 = Math.Round((double)res.Sum(res => res.Od_OS16_30), 0),
+                        Od_OS31_60 = Math.Round((double)res.Sum(res => res.Od_OS31_60), 0),
+                        Od_OSAbove_60 = Math.Round((double)res.Sum(res => res.Od_OSAbove_60), 0)
+                        /*
                         Receivable = res.Sum(res=> res.Receivable),
                         Not_Due_Amount = Math.Round((double)res.Sum(res => res.Cdue_OS0_30), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS31_60), 0) + Math.Round((double)res.Sum(res => res.Cdue_OS61_90), 0) + Math.Round((double)res.Sum(res => res.Cdue_OSAbv90), 0),
                         Cdue_OS0_30 = res.Sum(res => res.Cdue_OS0_30),
@@ -233,8 +308,9 @@ namespace PEGMiddleLayer.Controllers.Dashboard
                         COd_OS31_60=  res.Sum(res => res.COd_OS31_60),
                         COd_OS61_90= res.Sum(res => res.COd_OS61_90),
                         COd_OSAbv90 =  res.Sum(res => res.COd_OSAbv90)
+                        */
                     }
-                    ).Where(res => res.Receivable>0).OrderBy(res => res.GSTIN);
+                    ).Where(res => res.Total_Receivable>0).OrderBy(res => res.GSTIN);
                 return Ok(query);
             }
             catch (Exception ex)
