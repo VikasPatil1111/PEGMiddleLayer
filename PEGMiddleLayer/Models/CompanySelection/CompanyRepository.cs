@@ -45,6 +45,7 @@ namespace PEGMiddleLayer.Models.CompanySelection
         public async Task<IEnumerable<tblMainMenu_Access>> tblMainMenu_Accesses()
         {
              
+          //  IQueryable<tblMainMenu_Access>
                 return await _applicationDbContext.tblMainMenu_Access.ToListAsync();
             
         }

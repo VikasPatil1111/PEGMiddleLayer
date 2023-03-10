@@ -109,7 +109,7 @@ namespace PEGMiddleLayer.Controllers
 
                 //getAccess.Where(res => Roles.Contains(res.Role_Id)).Select(res=>res.Parent_Menu_ID);
 
-                string[] MenuAccess= new string[11];
+                string[] MenuAccess= new string[110];
                 //var query = ;
                 if (RoleDetails.Any()) {
                     int index = 0;
