@@ -17,7 +17,7 @@ namespace PEGMiddleLayer.Models.Sales.Utility
         public async Task<IEnumerable<Consignee_Type_Master>> GetConsignee_Type_Master()
         {
             //var consigneeList = await _companyDbContext.consignee_Type_Masters.ToListAsync();
-            return await _companyDbContext.consignee_Type_Master.ToListAsync();
+            return await _companyDbContext.Consignee_Type_Master.ToListAsync();
         }
     }
 }

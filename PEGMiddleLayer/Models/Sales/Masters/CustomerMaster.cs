@@ -31,7 +31,7 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         public string Country { get; set; }
         public string Registration { get; set; }
         public string Our_Code_With_Cust { get; set; }
-        public char? Branch_Code { get; set; }
+        public string Branch_Code { get; set; }
         
         public byte Status { get; set; }
         public string Ecc_No { get; set; }
@@ -43,7 +43,7 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         public string New_Eccno { get; set; }
         public string Cust_Add7 { get; set; }
         public string Cust_Add8 { get; set; }
-        public char? Cost_Centre_Code { get; set; }
+        public string Cost_Centre_Code { get; set; }
         public char? Cust_Catagary { get; set; }
        // public string Credit_Limit { get; set; }
         public int? Credit_Limit { get; set; }
@@ -56,7 +56,7 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         public string Contact_Person { get; set; }
         //check below
         public DateTime? Lock_From_Date { get; set; }
-        public char? Region_Code { get; set; }
+        public string Region_Code { get; set; }
         public double? OS_Limit { get; set; }
         public double? Actual_Balance { get; set; }
         public DateTime? OS_Limit_Date { get; set; }

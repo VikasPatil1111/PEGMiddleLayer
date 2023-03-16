@@ -139,8 +139,6 @@ namespace PEGMiddleLayer.Authentication
                 context.Response.StatusCode = 400;
                 return;
             }
-        }
-       
-
+        }  
     }
 }

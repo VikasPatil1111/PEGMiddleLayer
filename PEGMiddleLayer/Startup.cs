@@ -85,6 +85,7 @@ namespace PEGMiddleLayer
             services.AddScoped<IInvoiceMarginRepository, InvoiceMarginRepository>();
             services.AddScoped<IAccountReceivableRepository, AccountReceivableRepository>();
             services.AddScoped<IInventoryRepository, InventoryRepository>();
+            services.AddScoped<IBranchMasterRepository, BranchMasterRepository>();
             //Adding Authenticatio
             services.AddAuthentication(option =>
             {

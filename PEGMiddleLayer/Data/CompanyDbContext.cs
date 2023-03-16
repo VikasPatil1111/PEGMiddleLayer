@@ -30,8 +30,14 @@ namespace PEGMiddleLayer.Data
             } 
         }
         public DbSet<CustomerMaster> customerMasters { get; set; }
-
-        public DbSet<Consignee_Type_Master> consignee_Type_Master { get; set; }
+        public DbSet<Consignee_Type_Master> Consignee_Type_Master { get; set; }
+        public DbSet<Branch_Master> Branch_Master { get; set; }
+        public DbSet<GST_Percent_Master> GST_Percent_Master { get; set; }
+        public DbSet<State_Master> State_Master { get; set; }
+        public DbSet<Cost_Centre> Cost_Centre { get; set; }
+        public DbSet<Country_Master> Country_Master { get; set; }
+       // public DbSet<Consignee_Type_Master> Consignee_Type_Master { get; set; }
+        //  public DbSet<Consignee_Type_Master> Consignee_Type_Master { get; set; }
 
     }
 }

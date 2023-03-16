@@ -25,7 +25,7 @@ namespace PEGMiddleLayer.Controllers.Sales.Masters
             try
             {
                 var list = await _consignee_Type_MasterRepository.GetConsignee_Type_Master();
-                return Ok(list.OrderBy(x => x.Consignee_Type));
+                return Ok(list.OrderBy(x => x.Consignee_Type).Select(res => new { res.Consignee_Type, res.Consignee_Desc }).Distinct());
             }
             catch (Exception e)
             {

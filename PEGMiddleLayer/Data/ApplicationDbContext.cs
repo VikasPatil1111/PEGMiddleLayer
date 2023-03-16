@@ -80,7 +80,7 @@ namespace PEGMiddleLayer.Authentication
         public DbSet<vwInventotyTypeDetails> vwInventotyTypeDetails { get; set; }
         public DbSet<vwInventoryAgingSummaryAllocated> vwInventoryAgingSummaryAllocated { get; set; }
         public DbSet<vwInventoryAgingSummaryUnAllocated> vwInventoryAgingSummaryUnAllocated { get; set; }
-
+       // public DbSet<Consignee_Type_Master> Consignee_Type_Master { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
