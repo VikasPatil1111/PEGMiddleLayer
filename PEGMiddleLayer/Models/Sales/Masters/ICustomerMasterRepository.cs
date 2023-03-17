@@ -11,6 +11,7 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         Task<IEnumerable<CustomerMaster>> getCustomerMasters(string Search);
         Task<CustomerMaster> AddCustomerMaster(CustomerMaster customerMaster);
         Task<CustomerMaster> UpdateCustomerMaster(CustomerMaster customerMaster,int id);
+        Task<CustomerMaster> DeleteCustomerMaster(int Id);
         //  Task<IEnumerable<Consignee_Type_Master>> GetConsignee_Type_Masters();
         Task<IEnumerable<GST_Percent_Master>> GetGST_Percent_Masters();
 

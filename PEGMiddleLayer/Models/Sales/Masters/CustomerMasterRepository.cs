@@ -72,6 +72,15 @@ namespace PEGMiddleLayer.Models.Sales.Masters
             return result;
 
         }
+        public async Task<CustomerMaster> DeleteCustomerMaster(int Id)
+        {
+
+            var result = _applicationDbContext.customerMasters.FirstOrDefault(res => res._Id == Id);
+            _applicationDbContext.customerMasters.Remove(result);
+            await _applicationDbContext.SaveChangesAsync();
+            return result;
+
+        }
         //public async Task<IEnumerable<Consignee_Type_Master>> GetConsignee_Type_Masters()
         //{
         //    return await _applicationDbContext.Consignee_Type_Master.ToListAsync();

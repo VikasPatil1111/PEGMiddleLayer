@@ -64,6 +64,23 @@ namespace PEGMiddleLayer.Controllers.Sales.Masters
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating new Customer Master" + ex.Message);
             }
         }
+        [HttpDelete]
+        [Route("DeleteCustomerMaster/{Id}")]
+        public async Task<IActionResult> DeleteCustomerMaster(int Id)
+        {
+            try
+            {
+                var result = await _customerMasterRepository.DeleteCustomerMaster(Id);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Server Error Please Try Later..");
+            }
+        
+        }
 
         [HttpGet]
         [Route("getGSTPercentMaster")]

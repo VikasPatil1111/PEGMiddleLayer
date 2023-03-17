@@ -19,8 +19,8 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         private DateTime setCreate_Date = System.DateTime.Now;
         private string setState_Code="";
         private string setCompanyCode = "IV";
-
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int _Id { get; set; }
         //[Column(TypeName ="varchar(30)")]
         public string CompanyCode { get { return setCompanyCode; } set { value = setCompanyCode; } }
