@@ -75,9 +75,13 @@ namespace PEGMiddleLayer.Models.Sales.Masters
         public async Task<CustomerMaster> DeleteCustomerMaster(int Id)
         {
 
-            var result = _applicationDbContext.customerMasters.FirstOrDefault(res => res._Id == Id);
-            _applicationDbContext.customerMasters.Remove(result);
-            await _applicationDbContext.SaveChangesAsync();
+            CustomerMaster result = _applicationDbContext.customerMasters.FirstOrDefault(res => res._Id == Id);
+            if (result != null)
+            {
+                _applicationDbContext.customerMasters.Remove(result);
+                await _applicationDbContext.SaveChangesAsync();
+            }
+          
             return result;
 
         }

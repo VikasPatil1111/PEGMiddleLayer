@@ -77,7 +77,7 @@ namespace PEGMiddleLayer.Controllers.Sales.Masters
             catch (Exception ex)
             {
 
-                return StatusCode(StatusCodes.Status500InternalServerError, "Server Error Please Try Later..");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Server Error Please Try Later.. "+ ex.InnerException.Message);
             }
         
         }
