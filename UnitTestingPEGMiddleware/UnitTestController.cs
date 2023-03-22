@@ -31,20 +31,24 @@ namespace UnitTestingPEGMiddleware
             var CustomerController = new CustomerMasterController(customerRepository.Object);
 
             //act
-            IActionResult result =  await  CustomerController.getCustomerMaster("");
+            var result =  await  CustomerController.getCustomerMaster("");
             OkObjectResult objectResponse = Assert.IsType<OkObjectResult>(result);
-            ObjectResult res = Assert.IsType<ObjectResult>(result);
+            OkObjectResult okResult = result as OkObjectResult;
+
+            //ObjectResult res = Assert.IsType<ObjectResult>(result);
 
             
             // var result = customerResult.ExecuteResultAsync();
             //assert
             Assert.NotNull(result);
-            Assert.Equal(200, objectResponse.StatusCode);
-           // Assert.True(customerList.Count(),res.Value.);
-            //Assert.Equal()
-           // Assert.True(customerList.Equals(result));
-           // Assert.NotNull(customerResult);
-           // Assert.Equal(getCustomerMasters().Count(), result.Count());
+            Assert.Equal(customerList, okResult.Value);
+            Assert.True(result is OkObjectResult);
+             //using FluentAssertions
+                                          // Assert.True(customerList.Count(),res.Value.);
+                                          // Assert.Equal()
+                                          // Assert.True(customerList.Equals(result));
+                                          // Assert.NotNull(customerResult);
+                                          // Assert.Equal(getCustomerMasters().Count(), result.Count());
 
         }
 
